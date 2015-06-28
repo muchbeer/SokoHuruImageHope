@@ -3,4 +3,14 @@
 
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_main_activity_circular">MainActivityCircular</string>
+    <string name="title_activity_main_activity_beta">MainActivityBeta</string>
+
+    <string name="curved_text_value">In/Out Facility</string>
+    <string name="home_screen_observations">OBSERVATIONS</string>
+    <string name="total_observations">2375</string>
+    <string name="percent_value">65%</string>
+    <string name="home_screen_observed_compliance">OBSERVED\nCOMPLIANCE</string>
+    <string name="content_description">This is an image…</string>
+
 </resources>

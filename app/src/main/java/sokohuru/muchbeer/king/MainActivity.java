@@ -70,7 +70,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         else if (view==uploadButton) {
 
-            dialog = ProgressDialog.show(MainActivity.this, "", "Uploading file...", true);
+            //dialog = ProgressDialog.show(MainActivity.this, "", "Uploading file...", true);
+           dialog = new ProgressDialog(view.getContext());
+            dialog.setCancelable(true);
+            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+            dialog.setMessage("Uploading Images");
+            dialog.show();
+
             messageText.setText("uploading started.....");
             new Thread(new Runnable() {
                 public void run() {
