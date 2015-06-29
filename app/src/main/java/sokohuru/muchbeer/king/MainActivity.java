@@ -104,12 +104,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                             while (serverResponseCode != 200) {
                                 uploadFile(imagepath);
                               //  mProgressStatus = doWork();
-
+                                messagePercentage.setText(serverResponseCode);
                                 // Update the progress bar
                                 mHandler.post(new Runnable() {
                                     public void run() {
                                         progressBar.setProgress(serverResponseCode);
                                       //  progressBar.setVisibility(View.VISIBLE);
+
                                     }
                                 });
                             }
