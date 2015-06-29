@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="fill_parent"
@@ -44,11 +49,12 @@
             android:textColor="@color/white" />
 
         <TextView
+            android:id="@+id/txPercentate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginBottom="20dp"
             android:gravity="center_horizontal"
-            android:text="Or"
+            android:text="Set the percentage"
             android:textColor="@color/txt_font" />
 
         <!-- Record video button -->
@@ -64,4 +70,22 @@
             android:textColor="@color/white" />
     </LinearLayout>
 
+    <ProgressBar
+        android:id="@+id/circularProgressbar"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:visibility="gone"
+        android:indeterminateTint="@color/pink"
+        android:indeterminateTintMode="multiply"
+        android:max="100"
+        android:secondaryProgress="100"
+        android:background = "@drawable/progress"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"
+
+        />
+
+
 </RelativeLayout>
+
+</ScrollView>

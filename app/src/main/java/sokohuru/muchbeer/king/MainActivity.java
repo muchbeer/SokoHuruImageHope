@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -31,15 +33,19 @@ import java.util.GregorianCalendar;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener{
 
-    private TextView messageText;
+    private TextView messageText, messagePercentage;
     private EditText title,desc;
     private Button uploadButton, btnselectpic;
     private ImageView imageview;
     private int serverResponseCode = 0;
     private ProgressDialog dialog = null;
+    private ProgressBar progressBar;
 
+    int pStatus = 0;
     private String upLoadServerUri = null;
     private String imagepath=null;
+
+    private Handler mHandler = new Handler();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,18 +55,24 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         uploadButton = (Button)findViewById(R.id.upLoadButton);
         btnselectpic = (Button)findViewById(R.id.btnCapturePicture);
         messageText  = (TextView)findViewById(R.id.txTitle);
+       messagePercentage= (TextView) findViewById(R.id.txPercentate);
+        progressBar=(ProgressBar)  findViewById(R.id.circularProgressbar);
+
         imageview = (ImageView)findViewById(R.id.imageViewPic);
         title=(EditText)findViewById(R.id.title);
        // desc=(EditText)findViewById(R.id.etdesc);
 
         btnselectpic.setOnClickListener(this);
         uploadButton.setOnClickListener(this);
+      // progressBar.setVisibility(View.VISIBLE);
         upLoadServerUri = "http://sokouhuru.com/uploads.php";
         ImageView img= new ImageView(this);
     }
 
     @Override
     public void onClick(View view) {
+
+
         if(view==btnselectpic)
         {
             Intent intent = new Intent();
@@ -70,18 +82,40 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
         else if (view==uploadButton) {
 
+             // progressBar = new ProgressBar(view.getContext());
+
+            progressBar.setVisibility(View.VISIBLE);
             //dialog = ProgressDialog.show(MainActivity.this, "", "Uploading file...", true);
-           dialog = new ProgressDialog(view.getContext());
-            dialog.setCancelable(true);
-            dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-            dialog.setMessage("Uploading Images");
-            dialog.show();
+              // dialog = new ProgressDialog(view.getContext());
+          //  dialog.setCancelable(true);
+         //   dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
+         //   dialog.setMessage("Uploading Images");
+        //    dialog.show();
 
             messageText.setText("uploading started.....");
             new Thread(new Runnable() {
                 public void run() {
 
-                    uploadFile(imagepath);
+
+
+// Start lengthy operation in a background thread
+                    new Thread(new Runnable() {
+                        public void run() {
+                            while (serverResponseCode != 200) {
+                                uploadFile(imagepath);
+                              //  mProgressStatus = doWork();
+
+                                // Update the progress bar
+                                mHandler.post(new Runnable() {
+                                    public void run() {
+                                        progressBar.setProgress(serverResponseCode);
+                                      //  progressBar.setVisibility(View.VISIBLE);
+                                    }
+                                });
+                            }
+                        }
+                    }).start();
+
 
                 }
             }).start();
@@ -148,6 +182,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (!sourceFile.isFile()) {
 
             dialog.dismiss();
+            progressBar.setVisibility(View.GONE);
 
             Log.e("uploadFile", "Source File not exist :"+imagepath);
 
@@ -223,6 +258,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
                     runOnUiThread(new Runnable() {
                         public void run() {
+
+                            progressBar.setVisibility(View.GONE);
                             String msg = "File Upload Completed.\n\n See uploaded file here : \n\n"
                                     +"http://sokouhuru.com/uploads";
                             messageText.setText(msg);
@@ -238,11 +275,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
             } catch (MalformedURLException ex) {
 
-                dialog.dismiss();
+               // dialog.dismiss();
                 ex.printStackTrace();
 
                 runOnUiThread(new Runnable() {
                     public void run() {
+
+                        progressBar.setVisibility(View.GONE);
                         messageText.setText("MalformedURLException Exception : check script url.");
                         Toast.makeText(MainActivity.this, "MalformedURLException", Toast.LENGTH_SHORT).show();
                     }
@@ -251,18 +290,21 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
             } catch (Exception e) {
 
-                dialog.dismiss();
+               // dialog.dismiss();
                 e.printStackTrace();
 
                 runOnUiThread(new Runnable() {
                     public void run() {
+
+                        progressBar.setVisibility(View.GONE);
                         messageText.setText("Got Exception : see logcat ");
                         Toast.makeText(MainActivity.this, "Got Exception : see logcat ", Toast.LENGTH_SHORT).show();
                     }
                 });
                 Log.e("Upload server Exception", "Exception : " + e.getMessage(), e);
             }
-            dialog.dismiss();
+           // dialog.dismiss();
+            progressBar.setVisibility(View.GONE);
             return serverResponseCode;
 
         }
