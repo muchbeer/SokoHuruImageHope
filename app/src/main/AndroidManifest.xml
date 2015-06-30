@@ -27,6 +27,10 @@
             android:name=".MainActivityBeta"
             android:label="@string/title_activity_main_activity_beta" >
         </activity>
+        <activity
+            android:name=".MainActivityAsync"
+            android:label="@string/title_activity_main_activity_async" >
+        </activity>
     </application>
 
 </manifest>

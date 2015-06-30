@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.v7.app.ActionBarActivity;
@@ -33,13 +34,16 @@ import java.util.GregorianCalendar;
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener{
 
-    private TextView messageText, messagePercentage;
+    private TextView messageText;
+    private TextView messagePercentage;
     private EditText title,desc;
     private Button uploadButton, btnselectpic;
     private ImageView imageview;
     private int serverResponseCode = 0;
     private ProgressDialog dialog = null;
     private ProgressBar progressBar;
+
+    int bytesRead, count, bytesAvailable, bufferSize;
 
     int pStatus = 0;
     private String upLoadServerUri = null;
@@ -84,13 +88,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
              // progressBar = new ProgressBar(view.getContext());
 
-            progressBar.setVisibility(View.VISIBLE);
-            //dialog = ProgressDialog.show(MainActivity.this, "", "Uploading file...", true);
-              // dialog = new ProgressDialog(view.getContext());
-          //  dialog.setCancelable(true);
-         //   dialog.setProgressStyle(ProgressDialog.STYLE_SPINNER);
-         //   dialog.setMessage("Uploading Images");
-        //    dialog.show();
+          //  progressBar.setVisibility(View.VISIBLE);
+           // dialog = ProgressDialog.show(MainActivity.this, "", "Uploading file...", true);
+              dialog = new ProgressDialog(view.getContext());
+            dialog.setCancelable(true);
+            dialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            dialog.setMessage("Uploading Images");
+            dialog.show();
 
             messageText.setText("uploading started.....");
             new Thread(new Runnable() {
@@ -104,7 +108,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                             while (serverResponseCode != 200) {
                                 uploadFile(imagepath);
                               //  mProgressStatus = doWork();
-                                messagePercentage.setText(serverResponseCode);
+                              //  messagePercentage.setText(serverResponseCode);
                                 // Update the progress bar
                                 mHandler.post(new Runnable() {
                                     public void run() {
@@ -148,7 +152,28 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return cursor.getString(column_index);
     }
 
+public class DownloadFileAsync extends AsyncTask<String,String,String> {
 
+    @Override
+    protected void onPreExecute() {
+        super.onPreExecute();
+    }
+
+    @Override
+    protected String doInBackground(String... strings) {
+        return null;
+    }
+
+    @Override
+    protected void onProgressUpdate(String... values) {
+        super.onProgressUpdate(values);
+    }
+
+    @Override
+    protected void onPostExecute(String s) {
+        super.onPostExecute(s);
+    }
+}
     public int uploadFile(String sourceFileUri) {
 
         //sourceFileUri.replace(sourceFileUri, "ashifaq");
@@ -175,7 +200,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         String lineEnd = "\r\n";
         String twoHyphens = "--";
         String boundary = "*****";
-        int bytesRead, bytesAvailable, bufferSize;
+
+
+       long total =0;
+        int percentage;
         byte[] buffer;
         int maxBufferSize = 1 * 1024 * 1024;
         File sourceFile = new File(sourceFileUri);
@@ -183,7 +211,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         if (!sourceFile.isFile()) {
 
             dialog.dismiss();
-            progressBar.setVisibility(View.GONE);
+           // progressBar.setVisibility(View.GONE);
 
             Log.e("uploadFile", "Source File not exist :"+imagepath);
 
@@ -215,6 +243,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 conn.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
                 conn.setRequestProperty("uploaded_file", fileName);
 
+
                 dos = new DataOutputStream(conn.getOutputStream());
 
                 dos.writeBytes(twoHyphens + boundary + lineEnd);
@@ -235,12 +264,18 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 // read file and write it into form...
                 bytesRead = fileInputStream.read(buffer, 0, bufferSize);
 
-                while (bytesRead > 0) {
+              //  int lengthOfFile = conn.getContentLength();
+                while ((count = bytesRead) > 0) {
 
+                    total +=count;
+
+                 //   percentage = (int) (((total)/lengthOfFile)*100);
                     dos.write(buffer, 0, bufferSize);
                     bytesAvailable = fileInputStream.available();
                     bufferSize = Math.min(bytesAvailable, maxBufferSize);
                     bytesRead = fileInputStream.read(buffer, 0, bufferSize);
+                 //   publishProgress
+              //      messagePercentage.setText("I am coming home");
 
                 }
 
@@ -259,11 +294,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
                     runOnUiThread(new Runnable() {
                         public void run() {
-
-                            progressBar.setVisibility(View.GONE);
+                            int num =100;
+                           // progressBar.setVisibility(View.GONE);
+                           // messageText.setText(msg);
+                            dialog.dismiss();
                             String msg = "File Upload Completed.\n\n See uploaded file here : \n\n"
                                     +"http://sokouhuru.com/uploads";
-                            messageText.setText(msg);
+                           messageText.setText(msg);
                             Toast.makeText(MainActivity.this, "File Upload Complete.", Toast.LENGTH_SHORT).show();
                         }
                     });
@@ -276,13 +313,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
             } catch (MalformedURLException ex) {
 
-               // dialog.dismiss();
+                dialog.dismiss();
                 ex.printStackTrace();
 
                 runOnUiThread(new Runnable() {
                     public void run() {
 
-                        progressBar.setVisibility(View.GONE);
+                      //  progressBar.setVisibility(View.GONE);
                         messageText.setText("MalformedURLException Exception : check script url.");
                         Toast.makeText(MainActivity.this, "MalformedURLException", Toast.LENGTH_SHORT).show();
                     }
@@ -291,21 +328,21 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 Log.e("Upload file to server", "error: " + ex.getMessage(), ex);
             } catch (Exception e) {
 
-               // dialog.dismiss();
+                dialog.dismiss();
                 e.printStackTrace();
 
                 runOnUiThread(new Runnable() {
                     public void run() {
 
-                        progressBar.setVisibility(View.GONE);
-                        messageText.setText("Got Exception : see logcat ");
-                        Toast.makeText(MainActivity.this, "Got Exception : see logcat ", Toast.LENGTH_SHORT).show();
+                     //   progressBar.setVisibility(View.GONE);
+                        messageText.setText("Check your connection : see logcat ");
+                        Toast.makeText(MainActivity.this, "Check your connection and try again ", Toast.LENGTH_SHORT).show();
                     }
                 });
                 Log.e("Upload server Exception", "Exception : " + e.getMessage(), e);
             }
-           // dialog.dismiss();
-            progressBar.setVisibility(View.GONE);
+            dialog.dismiss();
+         //   progressBar.setVisibility(View.GONE);
             return serverResponseCode;
 
         }
