@@ -51,6 +51,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     private Handler mHandler = new Handler();
 
+
+    private String fileName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,28 +155,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return cursor.getString(column_index);
     }
 
-public class DownloadFileAsync extends AsyncTask<String,String,String> {
 
-    @Override
-    protected void onPreExecute() {
-        super.onPreExecute();
-    }
-
-    @Override
-    protected String doInBackground(String... strings) {
-        return null;
-    }
-
-    @Override
-    protected void onProgressUpdate(String... values) {
-        super.onProgressUpdate(values);
-    }
-
-    @Override
-    protected void onPostExecute(String s) {
-        super.onPostExecute(s);
-    }
-}
     public int uploadFile(String sourceFileUri) {
 
         //sourceFileUri.replace(sourceFileUri, "ashifaq");
@@ -193,7 +175,7 @@ public class DownloadFileAsync extends AsyncTask<String,String,String> {
 
         String name=(hour+""+minute+""+second+""+day+""+(month+1)+""+year);
         String tag=name+".jpg";
-        String fileName = sourceFileUri.replace(sourceFileUri,tag);
+        fileName = sourceFileUri.replace(sourceFileUri,tag);
 
         HttpURLConnection conn = null;
         DataOutputStream dos = null;
@@ -298,10 +280,10 @@ public class DownloadFileAsync extends AsyncTask<String,String,String> {
                            // progressBar.setVisibility(View.GONE);
                            // messageText.setText(msg);
                             dialog.dismiss();
-                            String msg = "File Upload Completed.\n\n See uploaded file here : \n\n"
-                                    +"http://sokouhuru.com/uploads";
+                            String msg = " See uploaded file here : \n\n"
+                                    +"http://sokouhuru.com/uploads/" + fileName;
                            messageText.setText(msg);
-                            Toast.makeText(MainActivity.this, "File Upload Complete.", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MainActivity.this, "File Upload Complete." + fileName, Toast.LENGTH_SHORT).show();
                         }
                     });
                 }
