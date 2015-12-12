@@ -346,6 +346,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+
+            Intent startImage = new Intent(getApplicationContext(), sokohuru.muchbeer.king.retrieve.MainActivity.class);
+            startActivity(startImage);
             return true;
         }
 

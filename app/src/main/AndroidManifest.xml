@@ -31,6 +31,18 @@
             android:name=".MainActivityAsync"
             android:label="@string/title_activity_main_activity_async" >
         </activity>
+
+        <activity
+            android:name=".retrieve.MainActivity"
+            android:label="@string/title_activity_main_activity_async" >
+        </activity>
+
+        <activity
+            android:name=".retrieve.ViewFullImage"
+            android:label="@string/title_activity_main_activity_async" >
+        </activity>
+
+
     </application>
 
 </manifest>
